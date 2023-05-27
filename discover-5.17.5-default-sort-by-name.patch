@@ -1,0 +1,12 @@
+diff -up discover-5.17.5/discover/discoversettings.kcfg.omv~ discover-5.17.5/discover/discoversettings.kcfg
+--- discover-5.17.5/discover/discoversettings.kcfg.omv~	2020-01-27 17:41:25.675581904 +0100
++++ discover-5.17.5/discover/discoversettings.kcfg	2020-01-27 17:42:26.764578940 +0100
+@@ -2,7 +2,7 @@
+ <kcfg xmlns="http://www.kde.org/standards/kcfg/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0 http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
+   <kcfgfile arg="true"/>
+   <group name="DiscoverUI">
+-    <entry name="appsListPageSorting" type="Int"><default>ResourcesProxyModel::SortableRatingRole</default></entry>
++    <entry name="appsListPageSorting" type="Int"><default>ResourcesProxyModel::NameRole</default></entry>
+     <entry name="installedPageSorting" type="Int"><default>ResourcesProxyModel::NameRole</default></entry>
+   </group>
+ </kcfg>

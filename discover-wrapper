@@ -1,0 +1,25 @@
+#!/bin/sh
+# Refresh/build the PackageKit cache before launching discover
+#
+# It would be nice to show a more descriptive text than "Updating..."
+# below -- but to keep people using languages other than English happy,
+# let's use a string that matches what we do and that exists in
+# discover translations...
+#
+# (C) 2021 Bernhard Rosenkraenzer <bero@lindev.ch>
+# SPDX-License-Identifier: GPL-3.0-only
+
+dbusRef=$(kdialog --desktopfile org.kde.discover --title $(gettext -d libdiscover 'Discover') --icon plasmadiscover --progressbar $(gettext -d libdiscover 'Updating...'))
+kdialogPid=`echo $dbusRef |cut -d- -f2 |cut -d' ' -f1`
+qdbus $dbusRef showCancelButton true
+qdbus $dbusRef Set "" "maximum" 0;
+
+pkcon -y -p refresh force &
+pkPid=$!
+
+while ps $kdialogPid &>/dev/null && ps $pkPid &>/dev/null && [ "`qdbus $dbusRef org.kde.kdialog.ProgressDialog.wasCancelled`" != "true" ]; do
+	sleep 1
+done
+[ "`qdbus $dbusRef org.kde.kdialog.ProgressDialog.wasCancelled`" != "true" ] && kill $pkPid
+ps $kdialogPid &>/dev/null && qdbus $dbusRef close
+exec /usr/bin/plasma-discover "$@"
