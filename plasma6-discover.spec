@@ -2,7 +2,7 @@
 %define git 20230527
 
 Summary:	Plasma 6 package manager
-Name:		discover
+Name:		plasma6-discover
 Version:	5.240.0
 Release:	%{?git:0.%{git}.}1
 License:	GPLv2+
