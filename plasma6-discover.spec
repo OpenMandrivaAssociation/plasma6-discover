@@ -1,5 +1,5 @@
 %define stable %([ "$(echo %{version} |cut -d. -f3)" -ge 70 ] && echo -n un; echo -n stable)
-%define git 20230606
+%define git 20230609
 
 Summary:	Plasma 6 package manager
 Name:		plasma6-discover
@@ -95,6 +95,7 @@ Plasma 6 package manager.
 %{_datadir}/kxmlgui6/plasmadiscover/plasmadiscoverui.rc
 %{_datadir}/knotifications6/discoverabstractnotifier.notifyrc
 %{_datadir}/metainfo/org.kde.discover.appdata.xml
+%{_qtdir}/plugins/plasma/kcms/systemsettings/kcm_updates.so
 
 #----------------------------------------------------------------------------
 
