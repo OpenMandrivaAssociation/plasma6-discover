@@ -70,6 +70,8 @@ BuildRequires:	cmake(KUserFeedbackQt6)
 BuildRequires:	git-core
 BuildRequires:	pkgconfig(flatpak)
 BuildRequires:	pkgconfig(libmarkdown)
+# Don't pull in Plasma 5
+BuildRequires:	plasma6-xdg-desktop-portal-kde
 %ifarch %{x86_64} %{ix86} %{aarch64}
 BuildRequires:	pkgconfig(fwupd)
 Recommends:	%{name}-backend-fwupd
