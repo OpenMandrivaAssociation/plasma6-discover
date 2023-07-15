@@ -1,5 +1,5 @@
 %define stable %([ "$(echo %{version} |cut -d. -f3)" -ge 70 ] && echo -n un; echo -n stable)
-%define git 20230707
+%define git 20230715
 
 Summary:	Plasma 6 package manager
 Name:		plasma6-discover
