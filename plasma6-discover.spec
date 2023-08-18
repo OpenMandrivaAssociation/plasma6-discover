@@ -1,5 +1,5 @@
 %define stable %([ "$(echo %{version} |cut -d. -f3)" -ge 70 ] && echo -n un; echo -n stable)
-%define git 20230812
+%define git 20230818
 
 Summary:	Plasma 6 package manager
 Name:		plasma6-discover
@@ -15,6 +15,7 @@ Source0:	http://download.kde.org/%{stable}/plasma/%(echo %{version} |cut -d. -f1
 %endif
 Source1:	discoverrc
 Patch0:		discover-5.17.5-default-sort-by-name.patch
+Patch1:		discover-dont-switch-branches.patch
 # (tpg) always force refresh, periodic refresh set to 12h instead of 24h
 Patch2:		https://src.fedoraproject.org/rpms/plasma-discover/raw/rawhide/f/discover-5.21.4-pk_refresh_force.patch
 BuildRequires:	cmake(ECM)
@@ -66,6 +67,7 @@ BuildRequires:	cmake(KF6ConfigWidgets)
 BuildRequires:	cmake(KF6KCMUtils)
 BuildRequires:	cmake(KF6IdleTime)
 BuildRequires:	cmake(KF6Purpose)
+BuildRequires:	cmake(KF6StatusNotifierItem)
 BuildRequires:	cmake(KUserFeedbackQt6)
 BuildRequires:	git-core
 BuildRequires:	pkgconfig(flatpak)

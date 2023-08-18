@@ -1,0 +1,27 @@
+diff -up discover-master/libdiscover/appstream/AppStreamIntegration.cpp.2~ discover-master/libdiscover/appstream/AppStreamIntegration.cpp
+--- discover-master/libdiscover/appstream/AppStreamIntegration.cpp.2~	2023-08-17 04:14:58.000000000 +0200
++++ discover-master/libdiscover/appstream/AppStreamIntegration.cpp	2023-08-18 03:52:10.071054004 +0200
+@@ -36,7 +36,12 @@ std::optional<AppStream::Release> AppStr
+     KConfigGroup settings(KSharedConfig::openConfig(QStringLiteral("discoverrc")), "DistroUpgrade");
+     bool allowPreRelease = settings.readEntry<bool>("AllowPreRelease", false);
+ 
+-    QString currentVersion = osRelease()->versionId();
++    const QString currentVersion = osRelease()->versionId();
++    const QString currentVersionString = osRelease()->version();
++
++    if(currentVersion == QStringLiteral("cooker") || currentVersion == QStringLiteral("rolling") || currentVersion == QStringLiteral("rock") || currentVersion.endsWith(QStringLiteral(".90")) || currentVersionString.contains(QStringLiteral("Cooker")) || currentVersionString.contains(QStringLiteral("Rolling")) || currentVersionString.contains(QStringLiteral("ROME")) || currentVersionString.contains(QStringLiteral("Rome"))) // Those are current versions no matter what...
++        return std::nullopt;
++
+     std::optional<AppStream::Release> nextRelease;
+     for (const AppStream::Component &dc : distroComponents) {
+         const auto releases = dc.releases();
+@@ -48,6 +53,9 @@ std::optional<AppStream::Release> AppStr
+ 
+             // Let's look at this potentially new verson
+             const QString newVersion = r.version();
++	    if (newVersion == QStringLiteral("cooker") || newVersion == QStringLiteral("rolling") || newVersion == QStringLiteral("rock")) // Don't list a different branch as a different version...
++                continue;
++
+             if (AppStream::Utils::vercmpSimple(newVersion, currentVersion) > 0) {
+                 if (!nextRelease) {
+                     // No other newer version found yet so let's pick this one
