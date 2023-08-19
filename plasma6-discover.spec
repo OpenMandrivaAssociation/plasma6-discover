@@ -1,5 +1,5 @@
 %define stable %([ "$(echo %{version} |cut -d. -f3)" -ge 70 ] && echo -n un; echo -n stable)
-%define git 20230818
+%define git 20230819
 
 Summary:	Plasma 6 package manager
 Name:		plasma6-discover
@@ -88,7 +88,7 @@ Plasma 6 package manager.
 %files -f all.lang
 %{_datadir}/qlogging-categories6/discover.categories
 %dir %{_libdir}/plasma-discover
-%dir %{_datadir}/kxmlgui6/plasmadiscover
+%{_datadir}/kxmlgui5/plasmadiscover
 %{_datadir}/applications/*.desktop
 %{_sysconfdir}/xdg/discoverrc
 %{_bindir}/plasma-discover
@@ -96,7 +96,6 @@ Plasma 6 package manager.
 %{_libdir}/plasma-discover/libDiscoverCommon.so
 %{_libdir}/plasma-discover/libDiscoverNotifiers.so
 %{_iconsdir}/hicolor/*/apps/plasmadiscover.*
-%{_datadir}/kxmlgui6/plasmadiscover/plasmadiscoverui.rc
 %{_datadir}/knotifications6/discoverabstractnotifier.notifyrc
 %{_datadir}/metainfo/org.kde.discover.appdata.xml
 %{_qtdir}/plugins/plasma/kcms/systemsettings/kcm_updates.so
