@@ -6,7 +6,7 @@
 Summary:	Plasma 6 package manager
 Name:		plasma6-discover
 Version:	6.0.2
-Release:	%{?git:0.%{git}.}2
+Release:	%{?git:0.%{git}.}3
 License:	GPLv2+
 Group:		Graphical desktop/KDE
 Url:		https://www.kde.org/
@@ -16,6 +16,7 @@ Source0:	https://invent.kde.org/plasma/discover/-/archive/%{gitbranch}/discover-
 Source0:	http://download.kde.org/%{stable}/plasma/%(echo %{version} |cut -d. -f1-3)/discover-%{version}.tar.xz
 %endif
 Source1:	discoverrc
+Source10:	discover-wrapper.in
 Patch0:		discover-5.17.5-default-sort-by-name.patch
 Patch1:		discover-dont-switch-branches.patch
 # (tpg) always force refresh, periodic refresh set to 12h instead of 24h
@@ -82,6 +83,9 @@ Recommends:	%{name}-backend-fwupd
 Requires:	%{name}-backend-kns
 Recommends:	%{name}-backend-packagekit
 Recommends:	%{name}-backend-flatpak
+# For the wrapper script
+Requires:	plasma6-kdialog
+Requires:	qt6-qttools-dbus
 
 %description
 Plasma 6 package manager.
@@ -93,6 +97,7 @@ Plasma 6 package manager.
 %{_datadir}/applications/*.desktop
 %{_sysconfdir}/xdg/discoverrc
 %{_bindir}/plasma-discover
+%{_bindir}/plasma-discover-main
 %{_bindir}/plasma-discover-update
 %{_libdir}/plasma-discover/libDiscoverCommon.so
 %{_libdir}/plasma-discover/libDiscoverNotifiers.so
@@ -195,6 +200,9 @@ Requires:	%{name} = %{EVRD}
 %install
 %ninja_install -C build
 install -m 644 -p -D %{SOURCE1} %{buildroot}%{_sysconfdir}/xdg/discoverrc
+mv %{buildroot}%{_bindir}/plasma-discover %{buildroot}%{_bindir}/plasma-discover-main
+sed -e 's,@QTDIR@,%{_qtdir},g' %{S:10} >%{buildroot}%{_bindir}/plasma-discover
+chmod 0755 %{buildroot}%{_bindir}/plasma-discover
 
 %find_lang libdiscover || touch libdiscover.lang
 %find_lang plasma-discover || touch plasma-discover.lang
