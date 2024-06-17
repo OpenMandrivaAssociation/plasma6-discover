@@ -6,7 +6,7 @@
 Summary:	Plasma 6 package manager
 Name:		plasma6-discover
 Version:	6.0.5
-Release:	%{?git:0.%{git}.}1
+Release:	%{?git:0.%{git}.}2
 License:	GPLv2+
 Group:		Graphical desktop/KDE
 Url:		https://www.kde.org/
@@ -22,7 +22,7 @@ Patch1:		discover-dont-switch-branches.patch
 # (tpg) always force refresh, periodic refresh set to 12h instead of 24h
 Patch2:		https://src.fedoraproject.org/rpms/plasma-discover/raw/rawhide/f/discover-5.21.4-pk_refresh_force.patch
 BuildRequires:	cmake(ECM)
-BuildRequires:	cmake(AppStreamQt) >= 0.10.4
+BuildRequires:	cmake(AppStreamQt) >= 1.0.3
 BuildRequires:	cmake(Qt6)
 BuildRequires:	cmake(Qt6Core)
 BuildRequires:	cmake(Qt6Widgets)
@@ -38,7 +38,6 @@ BuildRequires:	cmake(Qt6WebView)
 BuildRequires:	cmake(Qca-qt6)
 #BuildRequires:	pkgconfig(QtOAuth)
 BuildRequires:	cmake(packagekitqt6)
-BuildRequires:	cmake(AppStreamQt) >= 1.0
 BuildRequires:	cmake(KF6WidgetsAddons)
 BuildRequires:	cmake(KF6CoreAddons)
 BuildRequires:	cmake(KF6Crash)
