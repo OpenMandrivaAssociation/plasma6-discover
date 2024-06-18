@@ -1,6 +1,6 @@
-diff -up discover-5.90.0/libdiscover/appstream/AppStreamIntegration.cpp.2~ discover-5.90.0/libdiscover/appstream/AppStreamIntegration.cpp
---- discover-5.90.0/libdiscover/appstream/AppStreamIntegration.cpp.2~	2023-11-29 11:40:45.000000000 +0100
-+++ discover-5.90.0/libdiscover/appstream/AppStreamIntegration.cpp	2023-11-30 02:21:26.822424038 +0100
+diff -up discover-6.1.0/libdiscover/appstream/AppStreamIntegration.cpp.2~ discover-6.1.0/libdiscover/appstream/AppStreamIntegration.cpp
+--- discover-6.1.0/libdiscover/appstream/AppStreamIntegration.cpp.2~	2024-06-13 12:35:00.000000000 +0200
++++ discover-6.1.0/libdiscover/appstream/AppStreamIntegration.cpp	2024-06-18 16:21:54.069144504 +0200
 @@ -39,7 +39,11 @@ std::optional<AppStream::Release> AppStr
      KConfigGroup settings(KSharedConfig::openConfig(QStringLiteral("discoverrc")), u"DistroUpgrade"_s);
      bool allowPreRelease = settings.readEntry<bool>("AllowPreRelease", false);
@@ -14,11 +14,11 @@ diff -up discover-5.90.0/libdiscover/appstream/AppStreamIntegration.cpp.2~ disco
      std::optional<AppStream::Release> nextRelease;
      for (const AppStream::Component &dc : distroComponents) {
  #if ASQ_CHECK_VERSION(1, 0, 0)
-@@ -56,6 +60,9 @@ std::optional<AppStream::Release> AppStr
+@@ -55,6 +59,9 @@ std::optional<AppStream::Release> AppStr
  
-             // Let's look at this potentially new verson
+             // Let's look at this potentially new version
              const QString newVersion = r.version();
-+	    if (newVersion == QStringLiteral("cooker") || newVersion == QStringLiteral("rolling") || newVersion == QStringLiteral("rock")) // Don't list a different branch as a different version...
++            if (newVersion == QStringLiteral("cooker") || newVersion == QStringLiteral("rolling") || newVersion == QStringLiteral("rock")) // Don't list a different branch as a different version...
 +                continue;
 +
              if (AppStream::Utils::vercmpSimple(newVersion, currentVersion) > 0) {
