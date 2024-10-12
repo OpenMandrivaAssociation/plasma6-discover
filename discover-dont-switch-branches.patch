@@ -1,7 +1,7 @@
-diff -up discover-6.1.0/libdiscover/appstream/AppStreamIntegration.cpp.2~ discover-6.1.0/libdiscover/appstream/AppStreamIntegration.cpp
---- discover-6.1.0/libdiscover/appstream/AppStreamIntegration.cpp.2~	2024-06-13 12:35:00.000000000 +0200
-+++ discover-6.1.0/libdiscover/appstream/AppStreamIntegration.cpp	2024-06-18 16:21:54.069144504 +0200
-@@ -39,7 +39,11 @@ std::optional<AppStream::Release> AppStr
+diff -up discover-6.2.0/libdiscover/appstream/AppStreamIntegration.cpp.2~ discover-6.2.0/libdiscover/appstream/AppStreamIntegration.cpp
+--- discover-6.2.0/libdiscover/appstream/AppStreamIntegration.cpp.2~	2024-10-03 14:36:32.000000000 +0200
++++ discover-6.2.0/libdiscover/appstream/AppStreamIntegration.cpp	2024-10-12 04:51:35.158969333 +0200
+@@ -39,7 +39,12 @@ std::optional<AppStream::Release> AppStr
      KConfigGroup settings(KSharedConfig::openConfig(QStringLiteral("discoverrc")), u"DistroUpgrade"_s);
      bool allowPreRelease = settings.readEntry<bool>("AllowPreRelease", false);
  
@@ -11,10 +11,11 @@ diff -up discover-6.1.0/libdiscover/appstream/AppStreamIntegration.cpp.2~ discov
 +
 +    if(currentVersion == QStringLiteral("cooker") || currentVersion == QStringLiteral("rolling") || currentVersion == QStringLiteral("rock") || currentVersion.endsWith(QStringLiteral(".90")) || currentVersionString.contains(QStringLiteral("Cooker")) || currentVersionString.contains(QStringLiteral("Rolling")) || currentVersionString.contains(QStringLiteral("ROME")) || currentVersionString.contains(QStringLiteral("Rome"))) // Those are current versions no matter what...
 +        return std::nullopt;
++
      std::optional<AppStream::Release> nextRelease;
      for (const AppStream::Component &dc : distroComponents) {
- #if ASQ_CHECK_VERSION(1, 0, 0)
-@@ -55,6 +59,9 @@ std::optional<AppStream::Release> AppStr
+         const auto releases = dc.releasesPlain().entries();
+@@ -51,6 +56,9 @@ std::optional<AppStream::Release> AppStr
  
              // Let's look at this potentially new version
              const QString newVersion = r.version();
