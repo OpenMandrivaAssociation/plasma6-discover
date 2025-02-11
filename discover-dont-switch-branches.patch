@@ -1,9 +1,9 @@
-diff -up discover-6.2.0/libdiscover/appstream/AppStreamIntegration.cpp.2~ discover-6.2.0/libdiscover/appstream/AppStreamIntegration.cpp
---- discover-6.2.0/libdiscover/appstream/AppStreamIntegration.cpp.2~	2024-10-03 14:36:32.000000000 +0200
-+++ discover-6.2.0/libdiscover/appstream/AppStreamIntegration.cpp	2024-10-12 04:51:35.158969333 +0200
-@@ -39,7 +39,12 @@ std::optional<AppStream::Release> AppStr
-     KConfigGroup settings(KSharedConfig::openConfig(QStringLiteral("discoverrc")), u"DistroUpgrade"_s);
+diff -up discover-6.3.0/libdiscover/appstream/AppStreamIntegration.cpp.2~ discover-6.3.0/libdiscover/appstream/AppStreamIntegration.cpp
+--- discover-6.3.0/libdiscover/appstream/AppStreamIntegration.cpp.2~	2025-02-11 21:34:41.498135705 +0100
++++ discover-6.3.0/libdiscover/appstream/AppStreamIntegration.cpp	2025-02-11 21:44:53.838026929 +0100
+@@ -57,7 +57,11 @@ std::optional<AppStream::Release> AppStr
      bool allowPreRelease = settings.readEntry<bool>("AllowPreRelease", false);
+     bool allowDevelopmentRelease = settings.readEntry<bool>("AllowDevelopmentRelease", false);
  
 -    QString currentVersion = osRelease()->versionId();
 +    const QString currentVersion = osRelease()->versionId();
@@ -11,17 +11,15 @@ diff -up discover-6.2.0/libdiscover/appstream/AppStreamIntegration.cpp.2~ discov
 +
 +    if(currentVersion == QStringLiteral("cooker") || currentVersion == QStringLiteral("rolling") || currentVersion == QStringLiteral("rock") || currentVersion.endsWith(QStringLiteral(".90")) || currentVersionString.contains(QStringLiteral("Cooker")) || currentVersionString.contains(QStringLiteral("Rolling")) || currentVersionString.contains(QStringLiteral("ROME")) || currentVersionString.contains(QStringLiteral("Rome"))) // Those are current versions no matter what...
 +        return std::nullopt;
-+
-     std::optional<AppStream::Release> nextRelease;
-     for (const AppStream::Component &dc : distroComponents) {
-         const auto releases = dc.releasesPlain().entries();
-@@ -51,6 +56,9 @@ std::optional<AppStream::Release> AppStr
  
-             // Let's look at this potentially new version
+     // skip if current version is unknown
+     if (currentVersion.isEmpty()) {
+@@ -94,6 +98,8 @@ std::optional<AppStream::Release> AppStr
+ 
+             // Look at the potentially new version
              const QString newVersion = r.version();
 +            if (newVersion == QStringLiteral("cooker") || newVersion == QStringLiteral("rolling") || newVersion == QStringLiteral("rock")) // Don't list a different branch as a different version...
 +                continue;
-+
              if (AppStream::Utils::vercmpSimple(newVersion, currentVersion) > 0) {
                  if (!nextRelease) {
                      // No other newer version found yet so let's pick this one

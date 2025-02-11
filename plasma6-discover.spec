@@ -5,7 +5,7 @@
 
 Summary:	Plasma 6 package manager
 Name:		plasma6-discover
-Version:	6.2.5
+Version:	6.3.0
 Release:	%{?git:0.%{git}.}1
 License:	GPLv2+
 Group:		Graphical desktop/KDE
