@@ -6,7 +6,7 @@
 Summary:	Plasma 6 package manager
 Name:		plasma6-discover
 Version:	6.3.3
-Release:	%{?git:0.%{git}.}2
+Release:	%{?git:0.%{git}.}3
 License:	GPLv2+
 Group:		Graphical desktop/KDE
 Url:		https://www.kde.org/
@@ -21,6 +21,7 @@ Patch0:		discover-5.17.5-default-sort-by-name.patch
 Patch1:		discover-dont-switch-branches.patch
 # (tpg) always force refresh, periodic refresh set to 12h instead of 24h
 Patch2:		https://src.fedoraproject.org/rpms/plasma-discover/raw/rawhide/f/discover-5.21.4-pk_refresh_force.patch
+Patch3:		discover-6.3.3-upgrading-with-packagekit-is-dangerous.patch
 BuildRequires:	cmake(ECM)
 BuildRequires:	cmake(AppStreamQt) >= 1.0.3
 BuildRequires:	cmake(Qt6)
