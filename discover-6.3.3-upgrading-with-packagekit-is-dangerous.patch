@@ -1,15 +1,7 @@
 diff -up discover-6.3.3/libdiscover/backends/PackageKitBackend/PackageKitUpdater.cpp.4~ discover-6.3.3/libdiscover/backends/PackageKitBackend/PackageKitUpdater.cpp
 --- discover-6.3.3/libdiscover/backends/PackageKitBackend/PackageKitUpdater.cpp.4~	2025-03-11 14:41:09.000000000 +0100
-+++ discover-6.3.3/libdiscover/backends/PackageKitBackend/PackageKitUpdater.cpp	2025-03-29 02:22:17.429358726 +0100
-@@ -10,6 +10,7 @@
- 
- #include <PackageKit/Daemon>
- #include <PackageKit/Offline>
-+#include <QProcess>
- #include <QCryptographicHash>
- #include <QDBusConnection>
- #include <QDBusMessage>
-@@ -383,6 +384,7 @@ void PackageKitUpdater::checkFreeSpace()
++++ discover-6.3.3/libdiscover/backends/PackageKitBackend/PackageKitUpdater.cpp	2025-03-29 12:12:52.327864467 +0100
+@@ -383,6 +383,7 @@ void PackageKitUpdater::checkFreeSpace()
  
  void PackageKitUpdater::setupTransaction(PackageKit::Transaction::TransactionFlags flags)
  {
@@ -17,7 +9,7 @@ diff -up discover-6.3.3/libdiscover/backends/PackageKitBackend/PackageKitUpdater
      m_packagesModified.clear();
      if (m_toUpgrade.contains(m_upgrade) && m_upgrade->isDistroUpgrade()) {
          const QString &upgradeVersion = m_upgrade->getDistroUpgrade().version();
-@@ -417,6 +419,7 @@ void PackageKitUpdater::setupTransaction
+@@ -417,6 +418,7 @@ void PackageKitUpdater::setupTransaction
              });
          }
      }
@@ -25,7 +17,7 @@ diff -up discover-6.3.3/libdiscover/backends/PackageKitBackend/PackageKitUpdater
  }
  
  QSet<AbstractResource *> PackageKitUpdater::packagesForPackageId(const QSet<QString> &pkgids) const
-@@ -467,6 +470,7 @@ QSet<QString> PackageKitUpdater::involve
+@@ -467,6 +469,7 @@ QSet<QString> PackageKitUpdater::involve
  
  void PackageKitUpdater::processProceedFunction()
  {
@@ -33,7 +25,7 @@ diff -up discover-6.3.3/libdiscover/backends/PackageKitBackend/PackageKitUpdater
      auto t = m_proceedFunctions.takeFirst()();
      connect(t, &PackageKit::Transaction::finished, this, [this](PackageKit::Transaction::Exit status) {
          if (status != PackageKit::Transaction::Exit::ExitSuccess) {
-@@ -481,10 +485,12 @@ void PackageKitUpdater::processProceedFu
+@@ -481,10 +484,12 @@ void PackageKitUpdater::processProceedFu
              start();
          }
      });
@@ -46,7 +38,7 @@ diff -up discover-6.3.3/libdiscover/backends/PackageKitBackend/PackageKitUpdater
      if (!m_proceedFunctions.isEmpty()) {
          processProceedFunction();
      } else if (useOfflineUpdates()) {
-@@ -492,6 +498,7 @@ void PackageKitUpdater::proceed()
+@@ -492,6 +497,7 @@ void PackageKitUpdater::proceed()
      } else {
          setupTransaction(PackageKit::Transaction::TransactionFlagOnlyTrusted);
      }
@@ -54,32 +46,52 @@ diff -up discover-6.3.3/libdiscover/backends/PackageKitBackend/PackageKitUpdater
  }
  
  bool PackageKitUpdater::useOfflineUpdates() const
-@@ -521,6 +528,7 @@ bool PackageKitUpdater::isDistroUpgrade(
- 
- void PackageKitUpdater::start()
+@@ -523,16 +529,53 @@ void PackageKitUpdater::start()
  {
-+#if 0
      Q_ASSERT(!isProgressing());
  
++#if 0
      setupTransaction(PackageKit::Transaction::TransactionFlagSimulate);
-@@ -529,10 +537,25 @@ void PackageKitUpdater::start()
+     setProgressing(true);
+ 
      if (useOfflineUpdates()) {
          setNeedsReboot(true);
      }
 +#else
++
++    if(m_dnf) {
++        if(m_dnf->state() != QProcess::NotRunning) {
++            m_dnf->kill();
++            m_dnf->waitForFinished(1000);
++        }
++        delete m_dnf;
++    }
++    m_dnf = new QProcess(this);
++    connect(m_dnf, &QProcess::finished, this, &PackageKitUpdater::dnfFinished);
++    m_dnf->setProgram(QStringLiteral("/usr/bin/konsole"));
 +    if(isDistroUpgrade())
-+        QProcess::startDetached(QStringLiteral("konsole"), QStringList{QStringLiteral("pkexec"), QStringLiteral("dnf"), QStringLiteral("-y"), QStringLiteral("--refresh"), QStringLiteral("distro-sync")});
++        m_dnf->setArguments(QStringList{QStringLiteral("--hold"), QStringLiteral("-e"), QStringLiteral("pkexec"), QStringLiteral("dnf"), QStringLiteral("-y"), QStringLiteral("--refresh"), QStringLiteral("distro-sync")});
 +    else {
 +        auto pkgids = involvedPackages(m_toUpgrade).values();
 +        const auto packages = kTransform<QSet<QString>>(pkgids, [](const QString &pkgid) {
 +            return PackageKit::Daemon::packageName(pkgid);
 +        });
-+	QStringList dnfCommand{QStringLiteral("pkexec"), QStringLiteral("dnf"), QStringLiteral("-y"), QStringLiteral("--refresh"), QStringLiteral("distro-sync")};
++	QStringList dnfCommand{QStringLiteral("--hold"), QStringLiteral("-e"), QStringLiteral("pkexec"), QStringLiteral("dnf"), QStringLiteral("-y"), QStringLiteral("--refresh"), QStringLiteral("distro-sync")};
 +	for(const QString &p : packages)
 +		dnfCommand << p;
-+    	QProcess::startDetached(QStringLiteral("konsole"), dnfCommand);
++    	m_dnf->setArguments(dnfCommand);
 +    }
++    setProgressing(true);
++    m_dnf->startDetached();
 +#endif
++}
++
++void PackageKitUpdater::dnfFinished(int exitCode, QProcess::ExitStatus exitStatus) {
++    Q_EMIT progressChanged(100);
++    Q_EMIT resourceProgressed(m_upgrade, 100, Done);
++    setProgressing(false);
++    delete m_dnf;
++    m_dnf = nullptr;
  }
  
  void PackageKitUpdater::finished(PackageKit::Transaction::Exit exit, uint /*time*/)
@@ -88,7 +100,7 @@ diff -up discover-6.3.3/libdiscover/backends/PackageKitBackend/PackageKitUpdater
      // qCDebug(LIBDISCOVER_BACKEND_PACKAGEKIT_LOG) << "update finished!" << exit << time;
      if (!m_proceedFunctions.isEmpty()) {
          return;
-@@ -646,6 +669,7 @@ void PackageKitUpdater::finished(Package
+@@ -646,6 +689,7 @@ void PackageKitUpdater::finished(Package
          }
          enableReadyToReboot();
      }
@@ -96,3 +108,29 @@ diff -up discover-6.3.3/libdiscover/backends/PackageKitBackend/PackageKitUpdater
  }
  
  void PackageKitUpdater::cancellableChanged()
+diff -up discover-6.3.3/libdiscover/backends/PackageKitBackend/PackageKitUpdater.h.4~ discover-6.3.3/libdiscover/backends/PackageKitBackend/PackageKitUpdater.h
+--- discover-6.3.3/libdiscover/backends/PackageKitBackend/PackageKitUpdater.h.4~	2025-03-11 14:41:09.000000000 +0100
++++ discover-6.3.3/libdiscover/backends/PackageKitBackend/PackageKitUpdater.h	2025-03-29 12:13:28.799457839 +0100
+@@ -9,6 +9,8 @@
+ #include <PackageKit/Transaction>
+ #include <resources/AbstractBackendUpdater.h>
+ 
++#include <QProcess>
++
+ class SystemUpgrade;
+ 
+ struct EulaHandling {
+@@ -57,6 +59,7 @@ public Q_SLOTS:
+     void start() override;
+ 
+ private Q_SLOTS:
++    void dnfFinished(int exitCode, QProcess::ExitStatus exitStatus);
+     void errorFound(PackageKit::Transaction::Error err, const QString &error);
+     void mediaChange(PackageKit::Transaction::MediaType media, const QString &type, const QString &text);
+     void eulaRequired(const QString &eulaID, const QString &packageID, const QString &vendor, const QString &licenseAgreement);
+@@ -110,4 +113,5 @@ private:
+     PackageKit::Offline::Action m_offlineUpdateAction = PackageKit::Offline::Action::ActionReboot;
+ 
+     SystemUpgrade *m_upgrade = nullptr;
++    QProcess *m_dnf = nullptr;
+ };
