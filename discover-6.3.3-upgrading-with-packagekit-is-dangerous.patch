@@ -70,13 +70,13 @@ diff -up discover-6.3.3/libdiscover/backends/PackageKitBackend/PackageKitUpdater
 +    connect(m_dnf, &QProcess::finished, this, &PackageKitUpdater::dnfFinished);
 +    m_dnf->setProgram(QStringLiteral("/usr/bin/konsole"));
 +    if(isDistroUpgrade())
-+        m_dnf->setArguments(QStringList{QStringLiteral("--hold"), QStringLiteral("-e"), QStringLiteral("pkexec"), QStringLiteral("dnf"), QStringLiteral("-y"), QStringLiteral("--refresh"), QStringLiteral("distro-sync")});
++        m_dnf->setArguments(QStringList{QStringLiteral("--hold"), QStringLiteral("-e"), QStringLiteral("pkexec"), QStringLiteral("dnf"), QStringLiteral("-y"), QStringLiteral("--refresh"), QStringLiteral("distro-sync"), QStringLiteral("--allowerasing")});
 +    else {
 +        auto pkgids = involvedPackages(m_toUpgrade).values();
 +        const auto packages = kTransform<QSet<QString>>(pkgids, [](const QString &pkgid) {
 +            return PackageKit::Daemon::packageName(pkgid);
 +        });
-+	QStringList dnfCommand{QStringLiteral("--hold"), QStringLiteral("-e"), QStringLiteral("pkexec"), QStringLiteral("dnf"), QStringLiteral("-y"), QStringLiteral("--refresh"), QStringLiteral("distro-sync")};
++	QStringList dnfCommand{QStringLiteral("--hold"), QStringLiteral("-e"), QStringLiteral("pkexec"), QStringLiteral("dnf"), QStringLiteral("-y"), QStringLiteral("--refresh"), QStringLiteral("distro-sync"), QStringLiteral("--allowerasing")};
 +	for(const QString &p : packages)
 +		dnfCommand << p;
 +    	m_dnf->setArguments(dnfCommand);
