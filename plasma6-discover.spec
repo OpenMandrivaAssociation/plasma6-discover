@@ -6,7 +6,7 @@
 Summary:	Plasma 6 package manager
 Name:		plasma6-discover
 Version:	6.3.3
-Release:	%{?git:0.%{git}.}5
+Release:	%{?git:0.%{git}.}6
 License:	GPLv2+
 Group:		Graphical desktop/KDE
 Url:		https://www.kde.org/
@@ -16,6 +16,7 @@ Source0:	https://invent.kde.org/plasma/discover/-/archive/%{gitbranch}/discover-
 Source0:	http://download.kde.org/%{stable}/plasma/%(echo %{version} |cut -d. -f1-3)/discover-%{version}.tar.xz
 %endif
 Source1:	discoverrc
+Source2:	discover-upgrade
 Source10:	discover-wrapper.in
 Patch0:		discover-5.17.5-default-sort-by-name.patch
 Patch1:		discover-dont-switch-branches.patch
@@ -138,6 +139,7 @@ PackageKit backend for %{name}.
 %{_qtdir}/plugins/discover-notifier/DiscoverPackageKitNotifier.so
 %{_datadir}/libdiscover/categories/packagekit-backend-categories.xml
 %{_datadir}/metainfo/org.kde.discover.packagekit.appdata.xml
+%{_libexecdir}/discover-upgrade
 
 #----------------------------------------------------------------------------
 
@@ -189,6 +191,10 @@ Requires:	%{name} = %{EVRD}
 
 %prep
 %autosetup -p1 -n discover-%{?git:%{gitbranchd}}%{!?git:%{version}}
+# This sed statement supplements the upgrading-with-packagekit-is-dangerous patch
+sed -i -e 's,@LIBEXECDIR@,%{_libexecdir},g' libdiscover/backends/PackageKitBackend/PackageKitUpdater.cpp
+
+%conf
 %cmake \
 	-DBUILD_QCH:BOOL=ON \
 	-DBUILD_WITH_QT6:BOOL=ON \
@@ -205,6 +211,9 @@ install -m 644 -p -D %{SOURCE1} %{buildroot}%{_sysconfdir}/xdg/discoverrc
 mv %{buildroot}%{_bindir}/plasma-discover %{buildroot}%{_bindir}/plasma-discover-main
 sed -e 's,@QTDIR@,%{_qtdir},g' %{S:10} >%{buildroot}%{_bindir}/plasma-discover
 chmod 0755 %{buildroot}%{_bindir}/plasma-discover
+
+mkdir -p %{buildroot}%{_libexecdir}
+install -c -m 755 %{S:2} %{buildroot}%{_libexecdir}/
 
 %find_lang libdiscover || touch libdiscover.lang
 %find_lang plasma-discover || touch plasma-discover.lang
