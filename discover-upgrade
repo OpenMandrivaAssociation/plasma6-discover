@@ -1,5 +1,5 @@
 #!/bin/sh
-if dnf -y --refresh --allowerasing distro-sync "$@"; then
+if dnf -y --refresh distro-sync --allowerasing "$@"; then
 	echo
 	echo $"Update successful. Press enter to close this window."
 else
