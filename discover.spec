@@ -4,9 +4,9 @@
 %define gitbranchd %(echo %{gitbranch} |sed -e "s,/,-,g")
 
 Summary:	Plasma 6 package manager
-Name:		plasma6-discover
+Name:		discover
 Version:	6.3.4
-Release:	%{?git:0.%{git}.}3
+Release:	%{?git:0.%{git}.}4
 License:	GPLv2+
 Group:		Graphical desktop/KDE
 Url:		https://www.kde.org/
@@ -89,11 +89,16 @@ Recommends:	%{name}-backend-flatpak
 # For the wrapper script
 Requires:	plasma6-kdialog
 Requires:	qt6-qttools-dbus
+BuildSystem:	cmake
+BuildOption:	-DBUILD_QCH:BOOL=ON
+BuildOption:	-DKDE_INSTALL_USE_QT_SYS_PATHS:BOOL=ON
+# Renamed after 6.0 2025-05-01
+%rename plasma6-discover
 
 %description
 Plasma 6 package manager.
 
-%files -f all.lang
+%files -f %{name}.lang
 %{_datadir}/qlogging-categories6/discover.categories
 %dir %{_libdir}/plasma-discover
 %{_datadir}/kxmlgui5/plasmadiscover
@@ -189,24 +194,11 @@ Requires:	%{name} = %{EVRD}
 
 #----------------------------------------------------------------------------
 
-%prep
-%autosetup -p1 -n discover-%{?git:%{gitbranchd}}%{!?git:%{version}}
+%prep -a
 # This sed statement supplements the upgrading-with-packagekit-is-dangerous patch
 sed -i -e 's,@LIBEXECDIR@,%{_libexecdir},g' libdiscover/backends/PackageKitBackend/PackageKitUpdater.cpp
 
-%conf
-%cmake \
-	-DBUILD_QCH:BOOL=ON \
-	-DBUILD_WITH_QT6:BOOL=ON \
-	-DKDE_INSTALL_USE_QT_SYS_PATHS:BOOL=ON \
-	-DCMAKE_SKIP_RPATH:BOOL=OFF \
-	-G Ninja
-
-%build
-%ninja_build -C build
-
-%install
-%ninja_install -C build
+%install -a
 install -m 644 -p -D %{SOURCE1} %{buildroot}%{_sysconfdir}/xdg/discoverrc
 mv %{buildroot}%{_bindir}/plasma-discover %{buildroot}%{_bindir}/plasma-discover-main
 sed -e 's,@QTDIR@,%{_qtdir},g' %{S:10} >%{buildroot}%{_bindir}/plasma-discover
@@ -214,11 +206,3 @@ chmod 0755 %{buildroot}%{_bindir}/plasma-discover
 
 mkdir -p %{buildroot}%{_libexecdir}
 install -c -m 755 %{S:2} %{buildroot}%{_libexecdir}/
-
-%find_lang libdiscover || touch libdiscover.lang
-%find_lang plasma-discover || touch plasma-discover.lang
-%find_lang plasma-discover-notifier || touch plasma-discover-notifier.lang
-%find_lang plasma-discover-updater || touch plasma-discover-updater.lang
-%find_lang plasma_applet_org.kde.discovernotifier || touch plasma_applet_org.kde.discovernotifier.lang
-%find_lang kcm_updates || touch kcm_updates.lang
-cat *.lang > all.lang
