@@ -1,9 +1,0 @@
-#!/bin/sh
-if dnf -y --refresh distro-sync --allowerasing "$@"; then
-	echo
-	echo $"Update successful. Press enter to close this window."
-else
-	echo
-	echo $"Update failed. Press enter to close this window."
-fi
-read
